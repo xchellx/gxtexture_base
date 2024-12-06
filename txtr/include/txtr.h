@@ -34,6 +34,12 @@
 #include <gxtexture.h>
 #include <stb_image_resize2.h>
 
+#ifdef TXTR_IS_SHARED
+#define TXTR_EXPORT EXPORT
+#else
+#define TXTR_EXPORT
+#endif
+
 #if defined(TXTR_INCLUDE_DECODE) && !defined(GX_INCLUDE_DECODE)
 #error GX decoding capabilities are required
 #endif
@@ -117,58 +123,13 @@ typedef struct TXTR {
     bool isIndexed;
 } TXTR_t;
 
-FORCE_INLINE void TXTR_free(TXTR_t *txtr) {
-    free(txtr->pal);
-    txtr->pal = NULL;
-    free(txtr->mips);
-    txtr->mips = NULL;
-}
+TXTR_EXPORT void TXTR_free(TXTR_t *txtr);
 
-FORCE_INLINE bool TXTR_IsIndexed(TXTRFormat_t texFmt) {
-    return texFmt == TXTR_TTF_CI4 || texFmt == TXTR_TTF_CI8 || texFmt == TXTR_TTF_CI14X2;
-}
+TXTR_EXPORT bool TXTR_IsIndexed(TXTRFormat_t texFmt);
 
-FORCE_INLINE size_t TXTR_CalcMipSz(TXTRFormat_t texFmt, uint16_t width, uint16_t height) {
-    switch (texFmt) {
-        case TXTR_TTF_I4:
-            return GX_CalcMipSz(width, height, GX_I4_BPP);
-        case TXTR_TTF_I8:
-            return GX_CalcMipSz(width, height, GX_I8_BPP);
-        case TXTR_TTF_IA4:
-            return GX_CalcMipSz(width, height, GX_IA4_BPP);
-        case TXTR_TTF_IA8:
-            return GX_CalcMipSz(width, height, GX_IA8_BPP);
-        case TXTR_TTF_CI4:
-            return GX_CalcMipSz(width, height, GX_CI4_BPP);
-        case TXTR_TTF_CI8:
-            return GX_CalcMipSz(width, height, GX_CI8_BPP);
-        case TXTR_TTF_CI14X2:
-            return GX_CalcMipSz(width, height, GX_CI14X2_BPP);
-        case TXTR_TTF_R5G6B5:
-            return GX_CalcMipSz(width, height, GX_R5G6B5_BPP);
-        case TXTR_TTF_RGB5A3:
-            return GX_CalcMipSz(width, height, GX_RGB5A3_BPP);
-        case TXTR_TTF_RGBA8:
-            return GX_CalcMipSz(width, height, GX_RGBA8_BPP);
-        case TXTR_TTF_CMP:
-            return GX_CalcMipSz(width, height, GX_CMP_BPP);
-        default:
-            return 0;
-    }
-}
+TXTR_EXPORT size_t TXTR_CalcMipSz(TXTRFormat_t texFmt, uint16_t width, uint16_t height);
 
-FORCE_INLINE size_t TXTR_GetMaxPalSz(TXTRFormat_t texFmt) {
-    switch (texFmt) {
-        case TXTR_TTF_CI4:
-            return GX_GetMaxPalSz(GX_CI4_BPP);
-        case TXTR_TTF_CI8:
-            return GX_GetMaxPalSz(GX_CI8_BPP);
-        case TXTR_TTF_CI14X2:
-            return GX_GetMaxPalSz(GX_CI14X2_BPP);
-        default:
-            return 0;
-    }
-}
+TXTR_EXPORT size_t TXTR_GetMaxPalSz(TXTRFormat_t texFmt);
 
 #ifdef TXTR_INCLUDE_DECODE
 typedef struct TXTRDecodeOptions {
@@ -216,19 +177,16 @@ typedef enum TXTRDecodeError {
     TXTR_DE_FAILDECPAL
 } TXTRDecodeError_t;
 
-FORCE_INLINE void TXTRMipmap_free(TXTRMipmap_t *mip) {
-    free(mip->data);
-    mip->data = NULL;
-}
+TXTR_EXPORT void TXTRMipmap_free(TXTRMipmap_t *mip);
 
-TXTRReadError_t TXTR_Read(TXTR_t *txtr, size_t dataSz, uint8_t *data);
+TXTR_EXPORT TXTRReadError_t TXTR_Read(TXTR_t *txtr, size_t dataSz, uint8_t *data);
 
-TXTRDecodeError_t TXTR_Decode(TXTR_t *txtr, TXTRMipmap_t mipsOut[11], size_t *mipsOutCount,
+TXTR_EXPORT TXTRDecodeError_t TXTR_Decode(TXTR_t *txtr, TXTRMipmap_t mipsOut[11], size_t *mipsOutCount,
 TXTRDecodeOptions_t *opts);
 
-char *TXTRReadError_ToStr(TXTRReadError_t txtrReadError);
+TXTR_EXPORT char *TXTRReadError_ToStr(TXTRReadError_t txtrReadError);
 
-char *TXTRDecodeError_ToStr(TXTRDecodeError_t txtrDecodeError);
+TXTR_EXPORT char *TXTRDecodeError_ToStr(TXTRDecodeError_t txtrDecodeError);
 #endif
 
 #ifdef TXTR_INCLUDE_ENCODE
@@ -295,19 +253,18 @@ typedef enum TXTRWriteError {
     TXTR_WE_INTERRUPTED
 } TXTRWriteError_t;
 
-FORCE_INLINE void TXTRRawMipmap_free(TXTRRawMipmap_t *mip) {
-    free(mip->data);
-    mip->data = NULL;
-}
+TXTR_EXPORT void TXTRRawMipmap_free(TXTRRawMipmap_t *mip);
 
-TXTREncodeError_t TXTR_Encode(TXTRFormat_t texFmt, TXTRPaletteFormat_t palFmt, uint16_t width, uint16_t height,
-size_t dataSz, uint32_t *data, TXTR_t *txtr, TXTRRawMipmap_t txtrMips[11], TXTREncodeOptions_t *opts);
+TXTR_EXPORT TXTREncodeError_t TXTR_Encode(TXTRFormat_t texFmt, TXTRPaletteFormat_t palFmt, uint16_t width,
+uint16_t height, size_t dataSz, uint32_t *data, TXTR_t *txtr, TXTRRawMipmap_t txtrMips[11],
+TXTREncodeOptions_t *opts);
 
-TXTRWriteError_t TXTR_Write(TXTR_t *txtr, TXTRRawMipmap_t mips[11], size_t *txtrDataSz, uint8_t **txtrData);
+TXTR_EXPORT TXTRWriteError_t TXTR_Write(TXTR_t *txtr, TXTRRawMipmap_t mips[11], size_t *txtrDataSz,
+uint8_t **txtrData);
 
-char *TXTREncodeError_ToStr(TXTREncodeError_t txtrEncodeError);
+TXTR_EXPORT char *TXTREncodeError_ToStr(TXTREncodeError_t txtrEncodeError);
 
-char *TXTRWriteError_ToStr(TXTRWriteError_t txtrWriteError);
+TXTR_EXPORT char *TXTRWriteError_ToStr(TXTRWriteError_t txtrWriteError);
 #endif
 
 #endif

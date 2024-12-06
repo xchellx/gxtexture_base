@@ -35,4 +35,5 @@
 #define TXTR_COMP_SH_G @TXTR_COMP_SH_G@
 #define TXTR_COMP_SH_R @TXTR_COMP_SH_R@
 #define TXTR_COMP_SH_A @TXTR_COMP_SH_A@
+#cmakedefine TXTR_IS_SHARED
 #endif

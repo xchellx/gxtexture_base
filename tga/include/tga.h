@@ -39,6 +39,12 @@
 // From: https://wikipedia.org/wiki/Truevision_TGA
 // From: http://fileformats.archiveteam.org/wiki/TGA
 
+#ifdef TGA_IS_SHARED
+#define TGA_EXPORT EXPORT
+#else
+#define TGA_EXPORT
+#endif
+
 #define TGA_FOOTERSIG "TRUEVISION-XFILE."
 // Starting from end of file and subtracting length of "TRUEVISION-XFILE.\0"
 #define TGA_FOOTERSIGOFFS 18
@@ -404,27 +410,20 @@ typedef enum TGAWriteError {
 } TGAWriteError_t;
 #endif
 
-FORCE_INLINE void TGA_free(TGA_t *tga) {
-    free(tga->id);
-    tga->id = NULL;
-    free(tga->data);
-    tga->data = NULL;
-}
+TGA_EXPORT void TGA_free(TGA_t *tga);
 
-FORCE_INLINE bool TGA_IsNewFormat(size_t dataSz, uint8_t *data) {
-    return dataSz && data && !memcmp((data + dataSz) - TGA_FOOTERSIGOFFS, TGA_FOOTERSIG, TGA_FOOTERSIGOFFS);
-}
+TGA_EXPORT bool TGA_IsNewFormat(size_t dataSz, uint8_t *data);
 
 #ifdef TGA_INCLUDE_DECODE
-TGAReadError_t TGA_Read(TGA_t *tga, size_t dataSz, uint8_t *data);
+TGA_EXPORT TGAReadError_t TGA_Read(TGA_t *tga, size_t dataSz, uint8_t *data);
 
-char *TGAReadError_ToStr(TGAReadError_t tgaReadError);
+TGA_EXPORT char *TGAReadError_ToStr(TGAReadError_t tgaReadError);
 #endif
 
 #ifdef TGA_INCLUDE_ENCODE
-TGAWriteError_t TGA_Write(TGA_t *tga, size_t *tgaDataSz, uint8_t **tgaData);
+TGA_EXPORT TGAWriteError_t TGA_Write(TGA_t *tga, size_t *tgaDataSz, uint8_t **tgaData);
 
-char *TGAWriteError_ToStr(TGAWriteError_t tgaWriteError);
+TGA_EXPORT char *TGAWriteError_ToStr(TGAWriteError_t tgaWriteError);
 #endif
 
 #endif

@@ -39,6 +39,34 @@ FORCE_INLINE uint8_t Dat_BSwapDXT18(uint8_t value) {
     return bswap_dxt18(value);
 }
 
+GX_EXPORT size_t GX_CalcMipSz(uint16_t w, uint16_t h, uint8_t bpp) {
+    switch (bpp) {
+        case 4: // 4bpp, 8bw, 8bh
+            return (Dat_AlignU32(w, 8) * Dat_AlignU32(h, 8)) / 2;
+        case 8: // 8bpp, 8bw, 4bh
+            return  Dat_AlignU32(w, 8) * Dat_AlignU32(h, 4);
+        case 16: // 16bpp, 4bw, 4bh
+            return (Dat_AlignU32(w, 4) * Dat_AlignU32(h, 4)) * 2;
+        case 32: // 32bpp, 4bw, 4bh
+            return (Dat_AlignU32(w, 4) * Dat_AlignU32(h, 4)) * 4;
+        default:
+            return 0;
+    }
+}
+
+GX_EXPORT size_t GX_GetMaxPalSz(uint8_t bpp) {
+    switch (bpp) {
+        case GX_CI4_BPP:
+            return (1 << GX_CI4_PMUL);
+        case GX_CI8_BPP:
+            return (1 << GX_CI8_PMUL);
+        case GX_CI14X2_BPP:
+            return (1 << GX_CI14X2_PMUL);
+        default:
+            return 0;
+    }
+}
+
 #ifdef GX_INCLUDE_DECODE
 FORCE_INLINE void Dat_GetDXT1BE(uint8_t *s, uint8_t o[8]) {
     uint8_t *sPtr = s;
@@ -72,7 +100,7 @@ FORCE_INLINE uint32_t Dat_RGBA16ToBGRA(uint8_t outb[16 * 4], size_t px, size_t p
     );
 }
 
-size_t GX_DecodeI4(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeI4(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -103,7 +131,7 @@ GXDecodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(in, inPtr) : 0;
 }
 
-size_t GX_DecodeI8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeI8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -132,7 +160,7 @@ GXDecodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(in, inPtr) : 0;
 }
 
-size_t GX_DecodeIA4(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeIA4(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -161,7 +189,7 @@ GXDecodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(in, inPtr) : 0;
 }
 
-size_t GX_DecodeIA8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeIA8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -190,7 +218,7 @@ GXDecodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(in, inPtr) : 0;
 }
 
-size_t GX_DecodeCI4(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t palSz, uint32_t *pal, size_t outSz,
+GX_EXPORT size_t GX_DecodeCI4(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t palSz, uint32_t *pal, size_t outSz,
 uint32_t *out, GXDecodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !palSz || !pal || !outSz || !out || !opts)
         return 0;
@@ -225,7 +253,7 @@ uint32_t *out, GXDecodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(in, inPtr) : 0;
 }
 
-size_t GX_DecodeCI8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t palSz, uint32_t *pal, size_t outSz,
+GX_EXPORT size_t GX_DecodeCI8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t palSz, uint32_t *pal, size_t outSz,
 uint32_t *out, GXDecodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !palSz || !pal || !outSz || !out || !opts)
         return 0;
@@ -258,7 +286,7 @@ uint32_t *out, GXDecodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(in, inPtr) : 0;
 }
 
-size_t GX_DecodeCI14X2(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t palSz, uint32_t *pal, size_t outSz,
+GX_EXPORT size_t GX_DecodeCI14X2(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t palSz, uint32_t *pal, size_t outSz,
 uint32_t *out, GXDecodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !palSz || !pal || !outSz || !out || !opts)
         return 0;
@@ -291,7 +319,7 @@ uint32_t *out, GXDecodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(in, inPtr) : 0;
 }
 
-size_t GX_DecodeR5G6B5(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeR5G6B5(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -320,7 +348,7 @@ GXDecodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(in, inPtr) : 0;
 }
 
-size_t GX_DecodeRGB5A3(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeRGB5A3(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -349,7 +377,7 @@ GXDecodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(in, inPtr) : 0;
 }
 
-size_t GX_DecodeRGBA8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeRGBA8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -380,7 +408,7 @@ GXDecodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(in, inPtr) : 0;
 }
 
-size_t GX_DecodeCMP(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeCMP(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -425,7 +453,7 @@ GXDecodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(in, inPtr) : 0;
 }
 
-bool GX_DecodePaletteIA8(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDecodeOptions_t *opts) {
+GX_EXPORT bool GX_DecodePaletteIA8(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDecodeOptions_t *opts) {
     if (!palSz || !pal || !palOut || !opts)
         return true;
     
@@ -435,7 +463,7 @@ bool GX_DecodePaletteIA8(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDecode
     return !catexit_loopSafety;
 }
 
-bool GX_DecodePaletteR5G6B5(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDecodeOptions_t *opts) {
+GX_EXPORT bool GX_DecodePaletteR5G6B5(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDecodeOptions_t *opts) {
     if (!palSz || !pal || !palOut || !opts)
         return true;
     
@@ -445,7 +473,7 @@ bool GX_DecodePaletteR5G6B5(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDec
     return !catexit_loopSafety;
 }
 
-bool GX_DecodePaletteRGB5A3(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDecodeOptions_t *opts) {
+GX_EXPORT bool GX_DecodePaletteRGB5A3(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDecodeOptions_t *opts) {
     if (!palSz || !pal || !palOut || !opts)
         return true;
     
@@ -539,7 +567,7 @@ FORCE_INLINE uint32_t Clr_Multiply(uint32_t clr, double scalar) {
     );
 }
 
-size_t GX_EncodeI4(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeI4(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -569,7 +597,7 @@ GXEncodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(out, outPtr) : 0;
 }
 
-size_t GX_EncodeI8(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeI8(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -598,7 +626,7 @@ GXEncodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(out, outPtr) : 0;
 }
 
-size_t GX_EncodeIA4(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeIA4(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -627,7 +655,7 @@ GXEncodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(out, outPtr) : 0;
 }
 
-size_t GX_EncodeIA8(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeIA8(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -656,7 +684,7 @@ GXEncodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(out, outPtr) : 0;
 }
 
-size_t GX_EncodeCI4(uint16_t w, uint16_t h, size_t inIdxSz, uint32_t *inIdx, size_t palSz, size_t outIdxSz,
+GX_EXPORT size_t GX_EncodeCI4(uint16_t w, uint16_t h, size_t inIdxSz, uint32_t *inIdx, size_t palSz, size_t outIdxSz,
 uint8_t *outIdx, GXEncodeOptions_t *opts) {
     if (!w | !h || !inIdxSz || !inIdx || !palSz || !outIdxSz || !outIdx || !opts)
         return 0;
@@ -689,7 +717,7 @@ uint8_t *outIdx, GXEncodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(outIdx, outIdxPtr) : 0;
 }
 
-size_t GX_EncodeCI8(uint16_t w, uint16_t h, size_t inIdxSz, uint32_t *inIdx, size_t palSz, size_t outIdxSz,
+GX_EXPORT size_t GX_EncodeCI8(uint16_t w, uint16_t h, size_t inIdxSz, uint32_t *inIdx, size_t palSz, size_t outIdxSz,
 uint8_t *outIdx, GXEncodeOptions_t *opts) {
     if (!w | !h || !inIdxSz || !inIdx || !palSz || !outIdxSz || !outIdx || !opts)
         return 0;
@@ -722,7 +750,7 @@ uint8_t *outIdx, GXEncodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(outIdx, outIdxPtr) : 0;
 }
 
-size_t GX_EncodeCI14X2(uint16_t w, uint16_t h, size_t inIdxSz, uint32_t *inIdx, size_t palSz, size_t outIdxSz,
+GX_EXPORT size_t GX_EncodeCI14X2(uint16_t w, uint16_t h, size_t inIdxSz, uint32_t *inIdx, size_t palSz, size_t outIdxSz,
 uint8_t *outIdx, GXEncodeOptions_t *opts) {
     if (!w | !h || !inIdxSz || !inIdx || !palSz || !outIdxSz || !outIdx || !opts)
         return 0;
@@ -755,7 +783,7 @@ uint8_t *outIdx, GXEncodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(outIdx, outIdxPtr) : 0;
 }
 
-size_t GX_EncodeR5G6B5(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeR5G6B5(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -784,7 +812,7 @@ GXEncodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(out, outPtr) : 0;
 }
 
-size_t GX_EncodeRGB5A3(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeRGB5A3(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -813,7 +841,7 @@ GXEncodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(out, outPtr) : 0;
 }
 
-size_t GX_EncodeRGBA8(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeRGBA8(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts)
         return 0;
@@ -844,7 +872,7 @@ GXEncodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(out, outPtr) : 0;
 }
 
-size_t GX_EncodeCMP(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeCMP(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts) {
     if (!w | !h || !inSz || !in || !outSz || !out || !opts || (opts->squishMetric && opts->squishMetricSz != 3))
         return 0;
@@ -885,7 +913,7 @@ GXEncodeOptions_t *opts) {
     return catexit_loopSafety ? Dat_PtrDiff(out, outPtr) : 0;
 }
 
-bool GX_EncodePaletteIA8(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEncodeOptions_t *opts) {
+GX_EXPORT bool GX_EncodePaletteIA8(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEncodeOptions_t *opts) {
     if (!palSz || !pal || !palOut || !opts)
         return true;
     
@@ -895,7 +923,7 @@ bool GX_EncodePaletteIA8(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEncode
     return !catexit_loopSafety;
 }
 
-bool GX_EncodePaletteR5G6B5(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEncodeOptions_t *opts) {
+GX_EXPORT bool GX_EncodePaletteR5G6B5(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEncodeOptions_t *opts) {
     if (!palSz || !pal || !palOut || !opts)
         return true;
     
@@ -905,7 +933,7 @@ bool GX_EncodePaletteR5G6B5(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEnc
     return !catexit_loopSafety;
 }
 
-bool GX_EncodePaletteRGB5A3(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEncodeOptions_t *opts) {
+GX_EXPORT bool GX_EncodePaletteRGB5A3(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEncodeOptions_t *opts) {
     if (!palSz || !pal || !palOut || !opts)
         return true;
     
@@ -1124,7 +1152,7 @@ static double *kernd[9] = {
     }
 };
 
-bool GX_BuildPalette(uint16_t w, uint16_t h, size_t inSz, uint32_t *in, size_t palSz, uint32_t *pal, size_t outIdxSz,
+GX_EXPORT bool GX_BuildPalette(uint16_t w, uint16_t h, size_t inSz, uint32_t *in, size_t palSz, uint32_t *pal, size_t outIdxSz,
 uint32_t *outIdx, size_t *outPalSz, GXEncodeOptions_t *opts) {
     if (inSz != w * h || !in || (palSz != GX_GetMaxPalSz(GX_CI4_BPP) && palSz != GX_GetMaxPalSz(GX_CI8_BPP)
     && palSz != GX_GetMaxPalSz(GX_CI14X2_BPP)) || !pal || outIdxSz != inSz || !outIdx || !outPalSz || !opts

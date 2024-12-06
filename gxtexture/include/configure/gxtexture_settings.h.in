@@ -34,4 +34,5 @@
 #define GX_COMP_SH_G @GX_COMP_SH_G@
 #define GX_COMP_SH_R @GX_COMP_SH_R@
 #define GX_COMP_SH_A @GX_COMP_SH_A@
+#cmakedefine GXTEXTURE_IS_SHARED
 #endif

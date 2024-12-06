@@ -28,11 +28,8 @@ SOFTWARE.
 #include <stdlib.h>
 #include <limits.h>
 
-#include <stdext/cmacros.h>
 #include <stdext/cmath.h>
 #include <stb_ds.h>
-
-// TODO: Fully port this to C at the concept level (it just recreates the python logic at this point)
 
 static OCQColorArray_t *OCQColorArray___init__(void) {
     OCQColorArray_t *self = malloc(sizeof(OCQColorArray_t));
@@ -298,7 +295,7 @@ static OCQColor_t *OCQOctreeNode_get_color(OCQOctreeNode_t *self, OCQOctreeQuant
 }
 
 // Init Octree Quantizer
-OCQOctreeQuantizer_t *OCQOctreeQuantizer___init__(void) {
+OCQ_EXPORT OCQOctreeQuantizer_t *OCQOctreeQuantizer___init__(void) {
     OCQOctreeQuantizer_t *self = malloc(sizeof(OCQOctreeQuantizer_t));
     self->tmp_color = OCQColor___init__(0, 0, 0, 0);
     self->free_table = OCQOctreeNodeTable___init__();
@@ -310,7 +307,7 @@ OCQOctreeQuantizer_t *OCQOctreeQuantizer___init__(void) {
 }
 
 // Free Octree Quantizer
-void OCQOctreeQuantizer_free(OCQOctreeQuantizer_t *self) {
+OCQ_EXPORT void OCQOctreeQuantizer_free(OCQOctreeQuantizer_t *self) {
     if (!self)
         return;
     
@@ -361,7 +358,7 @@ static void OCQOctreeQuantizer_add_color(OCQOctreeQuantizer_t *self, OCQColor_t 
 }
 
 // Add `color` to the Octree (in raw uint32_t form)
-void OCQOctreeQuantizer_add_color_raw(OCQOctreeQuantizer_t *self, uint32_t color) {
+OCQ_EXPORT void OCQOctreeQuantizer_add_color_raw(OCQOctreeQuantizer_t *self, uint32_t color) {
     if (!self)
         return;
     
@@ -417,7 +414,7 @@ static OCQColorArray_t *OCQOctreeQuantizer_make_palette(OCQOctreeQuantizer_t *se
 }
 
 // Make color palette with `color_count` colors maximum (in raw uint32_t form)
-void OCQOctreeQuantizer_make_palette_raw(OCQOctreeQuantizer_t *self, size_t color_count, uint32_t *palette,
+OCQ_EXPORT void OCQOctreeQuantizer_make_palette_raw(OCQOctreeQuantizer_t *self, size_t color_count, uint32_t *palette,
 size_t *out_size) {
     if (!self || !color_count || color_count > 65536 || !palette || !out_size)
         return;
@@ -449,7 +446,7 @@ static size_t OCQOctreeQuantizer_get_palette_index(OCQOctreeQuantizer_t *self, O
 }
 
 // Get palette index for `color` (in raw size_t form)
-size_t OCQOctreeQuantizer_get_palette_index_raw(OCQOctreeQuantizer_t *self, uint32_t color) {
+OCQ_EXPORT size_t OCQOctreeQuantizer_get_palette_index_raw(OCQOctreeQuantizer_t *self, uint32_t color) {
     if (!self || !color)
         return 0;
     

@@ -31,8 +31,66 @@
 #include <stdext/catexit.h>
 #include <stb_image_resize2.h>
 
+TXTR_EXPORT void TXTR_free(TXTR_t *txtr) {
+    free(txtr->pal);
+    txtr->pal = NULL;
+    free(txtr->mips);
+    txtr->mips = NULL;
+}
+
+TXTR_EXPORT bool TXTR_IsIndexed(TXTRFormat_t texFmt) {
+    return texFmt == TXTR_TTF_CI4 || texFmt == TXTR_TTF_CI8 || texFmt == TXTR_TTF_CI14X2;
+}
+
+TXTR_EXPORT size_t TXTR_CalcMipSz(TXTRFormat_t texFmt, uint16_t width, uint16_t height) {
+    switch (texFmt) {
+        case TXTR_TTF_I4:
+            return GX_CalcMipSz(width, height, GX_I4_BPP);
+        case TXTR_TTF_I8:
+            return GX_CalcMipSz(width, height, GX_I8_BPP);
+        case TXTR_TTF_IA4:
+            return GX_CalcMipSz(width, height, GX_IA4_BPP);
+        case TXTR_TTF_IA8:
+            return GX_CalcMipSz(width, height, GX_IA8_BPP);
+        case TXTR_TTF_CI4:
+            return GX_CalcMipSz(width, height, GX_CI4_BPP);
+        case TXTR_TTF_CI8:
+            return GX_CalcMipSz(width, height, GX_CI8_BPP);
+        case TXTR_TTF_CI14X2:
+            return GX_CalcMipSz(width, height, GX_CI14X2_BPP);
+        case TXTR_TTF_R5G6B5:
+            return GX_CalcMipSz(width, height, GX_R5G6B5_BPP);
+        case TXTR_TTF_RGB5A3:
+            return GX_CalcMipSz(width, height, GX_RGB5A3_BPP);
+        case TXTR_TTF_RGBA8:
+            return GX_CalcMipSz(width, height, GX_RGBA8_BPP);
+        case TXTR_TTF_CMP:
+            return GX_CalcMipSz(width, height, GX_CMP_BPP);
+        default:
+            return 0;
+    }
+}
+
+TXTR_EXPORT size_t TXTR_GetMaxPalSz(TXTRFormat_t texFmt) {
+    switch (texFmt) {
+        case TXTR_TTF_CI4:
+            return GX_GetMaxPalSz(GX_CI4_BPP);
+        case TXTR_TTF_CI8:
+            return GX_GetMaxPalSz(GX_CI8_BPP);
+        case TXTR_TTF_CI14X2:
+            return GX_GetMaxPalSz(GX_CI14X2_BPP);
+        default:
+            return 0;
+    }
+}
+
 #ifdef TXTR_INCLUDE_DECODE
-TXTRReadError_t TXTR_Read(TXTR_t *txtr, size_t dataSz, uint8_t *data) {
+TXTR_EXPORT void TXTRMipmap_free(TXTRMipmap_t *mip) {
+    free(mip->data);
+    mip->data = NULL;
+}
+
+TXTR_EXPORT TXTRReadError_t TXTR_Read(TXTR_t *txtr, size_t dataSz, uint8_t *data) {
     if (txtr) {
         txtr->pal = NULL;
         txtr->mips = NULL;
@@ -116,7 +174,7 @@ TXTRReadError_t TXTR_Read(TXTR_t *txtr, size_t dataSz, uint8_t *data) {
     return TXTR_RE_SUCCESS;
 }
 
-TXTRDecodeError_t TXTR_Decode(TXTR_t *txtr, TXTRMipmap_t mipsOut[11], size_t *mipsOutCount,
+TXTR_EXPORT TXTRDecodeError_t TXTR_Decode(TXTR_t *txtr, TXTRMipmap_t mipsOut[11], size_t *mipsOutCount,
 TXTRDecodeOptions_t *opts) {
     if (!txtr || !mipsOut || !mipsOutCount || !opts || (txtr->isIndexed && !TXTR_IsIndexed(txtr->hdr.format)))
         return TXTR_DE_INVLDPARAMS;
@@ -258,7 +316,7 @@ TXTRDecodeOptions_t *opts) {
     return TXTR_DE_SUCCESS;
 }
 
-char *TXTRReadError_ToStr(TXTRReadError_t txtrReadError) {
+TXTR_EXPORT char *TXTRReadError_ToStr(TXTRReadError_t txtrReadError) {
     switch (txtrReadError) {
         case TXTR_RE_SUCCESS:
             return "TXTR_RE_SUCCESS"
@@ -341,7 +399,7 @@ char *TXTRReadError_ToStr(TXTRReadError_t txtrReadError) {
     }
 }
 
-char *TXTRDecodeError_ToStr(TXTRDecodeError_t txtrDecodeError) {
+TXTR_EXPORT char *TXTRDecodeError_ToStr(TXTRDecodeError_t txtrDecodeError) {
     switch (txtrDecodeError) {
         case TXTR_DE_SUCCESS:
             return "TXTR_DE_SUCCESS"
@@ -432,8 +490,14 @@ char *TXTRDecodeError_ToStr(TXTRDecodeError_t txtrDecodeError) {
 #endif
 
 #ifdef TXTR_INCLUDE_ENCODE
-TXTREncodeError_t TXTR_Encode(TXTRFormat_t texFmt, TXTRPaletteFormat_t palFmt, uint16_t width, uint16_t height,
-size_t dataSz, uint32_t *data, TXTR_t *txtr, TXTRRawMipmap_t txtrMips[11], TXTREncodeOptions_t *opts) {
+TXTR_EXPORT void TXTRRawMipmap_free(TXTRRawMipmap_t *mip) {
+    free(mip->data);
+    mip->data = NULL;
+}
+
+TXTR_EXPORT TXTREncodeError_t TXTR_Encode(TXTRFormat_t texFmt, TXTRPaletteFormat_t palFmt, uint16_t width,
+uint16_t height, size_t dataSz, uint32_t *data, TXTR_t *txtr, TXTRRawMipmap_t txtrMips[11],
+TXTREncodeOptions_t *opts) {
     if (txtr) {
         txtr->pal = NULL;
         txtr->mips = NULL;
@@ -560,7 +624,8 @@ size_t dataSz, uint32_t *data, TXTR_t *txtr, TXTRRawMipmap_t txtrMips[11], TXTRE
             return TXTR_EE_FAILENCPAL;
         }
         
-        // TODO: Palette dimensions based on imperfect square root (as an option? this could go with handling TGA palette)
+        // TODO: Palette dimensions based on imperfect square root (as an option? this could go with handling TGA
+        // palette)
         txtr->palHdr.width = txtr->palSz;
         txtr->palHdr.height = 1;
     }
@@ -694,7 +759,8 @@ size_t dataSz, uint32_t *data, TXTR_t *txtr, TXTRRawMipmap_t txtrMips[11], TXTRE
     return  TXTR_EE_SUCCESS;
 }
 
-TXTRWriteError_t TXTR_Write(TXTR_t *txtr, TXTRRawMipmap_t mips[11], size_t *txtrDataSz, uint8_t **txtrData) {
+TXTR_EXPORT TXTRWriteError_t TXTR_Write(TXTR_t *txtr, TXTRRawMipmap_t mips[11], size_t *txtrDataSz,
+uint8_t **txtrData) {
     if (!txtr || !mips || (txtr->isIndexed && !TXTR_IsIndexed(txtr->hdr.format)))
         return TXTR_WE_INVLDPARAMS;
     
@@ -780,7 +846,7 @@ TXTRWriteError_t TXTR_Write(TXTR_t *txtr, TXTRRawMipmap_t mips[11], size_t *txtr
     return TXTR_WE_SUCCESS;
 }
 
-char *TXTREncodeError_ToStr(TXTREncodeError_t txtrEncodeError) {
+TXTR_EXPORT char *TXTREncodeError_ToStr(TXTREncodeError_t txtrEncodeError) {
     switch (txtrEncodeError) {
         case TXTR_EE_SUCCESS:
             return "TXTR_EE_SUCCESS"
@@ -923,7 +989,7 @@ char *TXTREncodeError_ToStr(TXTREncodeError_t txtrEncodeError) {
     }
 }
 
-char *TXTRWriteError_ToStr(TXTRWriteError_t txtrWriteError) {
+TXTR_EXPORT char *TXTRWriteError_ToStr(TXTRWriteError_t txtrWriteError) {
     switch (txtrWriteError) {
         case TXTR_WE_SUCCESS:
             return "TXTR_WE_SUCCESS"

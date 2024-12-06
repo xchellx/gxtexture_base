@@ -27,4 +27,5 @@
 #cmakedefine TGA_INCLUDE_ERROR_STRINGS
 #cmakedefine TGA_INCLUDE_DECODE
 #cmakedefine TGA_INCLUDE_ENCODE
+#cmakedefine TGA_IS_SHARED
 #endif

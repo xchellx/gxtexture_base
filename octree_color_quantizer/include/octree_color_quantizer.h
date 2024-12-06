@@ -29,7 +29,18 @@ SOFTWARE.
 #include <stdbool.h>
 #include <stddef.h>
 
+#include <stdext/cmacros.h>
+
 // Port of https://github.com/delimitry/octree_color_quantizer to C
+
+// TODO: Fully port this to C at the concept level (it just recreates the python logic at this point)
+// WARN: This API is not final! It may change DRASTICALLY in the future!
+
+#ifdef OCTREE_COLOR_QUANTIZER_IS_SHARED
+#define OCQ_EXPORT EXPORT
+#else
+#define OCQ_EXPORT
+#endif
 
 typedef struct OCQColor OCQColor_t;
 typedef struct OCQColorArray OCQColorArray_t;
@@ -80,18 +91,18 @@ struct OCQOctreeQuantizer {
 };
 
 // Init Octree Quantizer
-OCQOctreeQuantizer_t *OCQOctreeQuantizer___init__(void);
+OCQ_EXPORT OCQOctreeQuantizer_t *OCQOctreeQuantizer___init__(void);
 
 // Free Octree Quantizer
-void OCQOctreeQuantizer_free(OCQOctreeQuantizer_t *self);
+OCQ_EXPORT void OCQOctreeQuantizer_free(OCQOctreeQuantizer_t *self);
 
 // Add `color` to the Octree (in raw uint32_t form)
-void OCQOctreeQuantizer_add_color_raw(OCQOctreeQuantizer_t *self, uint32_t color);
+OCQ_EXPORT void OCQOctreeQuantizer_add_color_raw(OCQOctreeQuantizer_t *self, uint32_t color);
 
 // Make color palette with `color_count` colors maximum (in raw uint32_t form)
-void OCQOctreeQuantizer_make_palette_raw(OCQOctreeQuantizer_t *self, size_t color_count, uint32_t *palette,
+OCQ_EXPORT void OCQOctreeQuantizer_make_palette_raw(OCQOctreeQuantizer_t *self, size_t color_count, uint32_t *palette,
 size_t *out_size);
 
 // Get palette index for `color` (in raw size_t form)
-size_t OCQOctreeQuantizer_get_palette_index_raw(OCQOctreeQuantizer_t *self, uint32_t color);
+OCQ_EXPORT size_t OCQOctreeQuantizer_get_palette_index_raw(OCQOctreeQuantizer_t *self, uint32_t color);
 #endif

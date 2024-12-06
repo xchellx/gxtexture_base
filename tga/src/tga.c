@@ -28,6 +28,17 @@
 #include <stdext/catexit.h>
 #include <stdext/cmath.h>
 
+GX_EXPORT void TGA_free(TGA_t *tga) {
+    free(tga->id);
+    tga->id = NULL;
+    free(tga->data);
+    tga->data = NULL;
+}
+
+TGA_EXPORT bool TGA_IsNewFormat(size_t dataSz, uint8_t *data) {
+    return dataSz && data && !memcmp((data + dataSz) - TGA_FOOTERSIGOFFS, TGA_FOOTERSIG, TGA_FOOTERSIGOFFS);
+}
+
 #ifdef TGA_INCLUDE_DECODE
 TGAReadError_t TGA_Read(TGA_t *tga, size_t dataSz, uint8_t *data) {
     if (!tga || !dataSz || !data)

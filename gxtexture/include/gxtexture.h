@@ -42,6 +42,12 @@
 // - Luigis-Mansion-Blender-Toolkit: https://github.com/Astral-C/Luigis-Mansion-Blender-Toolkit/blob/3c596b1f64d7d506ed37e131cec6f95ec8df3766/gx_texture.py
 // - PrimeWorldEditor: https://github.com/AxioDL/PrimeWorldEditor/blob/e5d1678ff626fd16c7160332e1e59003804f970a/src/Core/Resource/Factory/CTextureDecoder.cpp
 
+#ifdef GXTEXTURE_IS_SHARED
+#define GX_EXPORT EXPORT
+#else
+#define GX_EXPORT
+#endif
+
 #define GX_I4_BW 8
 #define GX_I4_BH 8
 #define GX_I4_BPP 4
@@ -89,33 +95,9 @@
 #define GX_CMP_BH 8
 #define GX_CMP_BPP 4
 
-FORCE_INLINE size_t GX_CalcMipSz(uint16_t w, uint16_t h, uint8_t bpp) {
-    switch (bpp) {
-        case 4: // 4bpp, 8bw, 8bh
-            return (Dat_AlignU32(w, 8) * Dat_AlignU32(h, 8)) / 2;
-        case 8: // 8bpp, 8bw, 4bh
-            return  Dat_AlignU32(w, 8) * Dat_AlignU32(h, 4);
-        case 16: // 16bpp, 4bw, 4bh
-            return (Dat_AlignU32(w, 4) * Dat_AlignU32(h, 4)) * 2;
-        case 32: // 32bpp, 4bw, 4bh
-            return (Dat_AlignU32(w, 4) * Dat_AlignU32(h, 4)) * 4;
-        default:
-            return 0;
-    }
-}
+GX_EXPORT size_t GX_CalcMipSz(uint16_t w, uint16_t h, uint8_t bpp);
 
-FORCE_INLINE size_t GX_GetMaxPalSz(uint8_t bpp) {
-    switch (bpp) {
-        case GX_CI4_BPP:
-            return (1 << GX_CI4_PMUL);
-        case GX_CI8_BPP:
-            return (1 << GX_CI8_PMUL);
-        case GX_CI14X2_BPP:
-            return (1 << GX_CI14X2_PMUL);
-        default:
-            return 0;
-    }
-}
+GX_EXPORT size_t GX_GetMaxPalSz(uint8_t bpp);
 
 #ifdef GX_INCLUDE_DECODE
 typedef struct GXDecodeOptions {
@@ -303,44 +285,44 @@ FORCE_INLINE uint32_t GX_DecodeRGBA8Group(uint16_t inp, uint8_t grp, uint32_t pr
     }
 }
 
-size_t GX_DecodeI4(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeI4(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts);
 
-size_t GX_DecodeI8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeI8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts);
 
-size_t GX_DecodeIA4(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeIA4(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts);
 
-size_t GX_DecodeIA8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeIA8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts);
 
-size_t GX_DecodeCI4(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t palSz, uint32_t *pal, size_t outSz,
+GX_EXPORT size_t GX_DecodeCI4(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t palSz, uint32_t *pal, size_t outSz,
 uint32_t *out, GXDecodeOptions_t *opts);
 
-size_t GX_DecodeCI8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t palSz, uint32_t *pal, size_t outSz,
+GX_EXPORT size_t GX_DecodeCI8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t palSz, uint32_t *pal, size_t outSz,
 uint32_t *out, GXDecodeOptions_t *opts);
 
-size_t GX_DecodeCI14X2(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t palSz, uint32_t *pal, size_t outSz,
+GX_EXPORT size_t GX_DecodeCI14X2(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t palSz, uint32_t *pal, size_t outSz,
 uint32_t *out, GXDecodeOptions_t *opts);
 
-size_t GX_DecodeR5G6B5(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeR5G6B5(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts);
 
-size_t GX_DecodeRGB5A3(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeRGB5A3(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts);
 
-size_t GX_DecodeRGBA8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeRGBA8(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts);
 
-size_t GX_DecodeCMP(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
+GX_EXPORT size_t GX_DecodeCMP(uint16_t w, uint16_t h, size_t inSz, uint8_t *in, size_t outSz, uint32_t *out,
 GXDecodeOptions_t *opts);
 
-bool GX_DecodePaletteIA8(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDecodeOptions_t *opts);
+GX_EXPORT bool GX_DecodePaletteIA8(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDecodeOptions_t *opts);
 
-bool GX_DecodePaletteR5G6B5(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDecodeOptions_t *opts);
+GX_EXPORT bool GX_DecodePaletteR5G6B5(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDecodeOptions_t *opts);
 
-bool GX_DecodePaletteRGB5A3(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDecodeOptions_t *opts);
+GX_EXPORT bool GX_DecodePaletteRGB5A3(size_t palSz, uint16_t *pal, uint32_t *palOut, GXDecodeOptions_t *opts);
 #endif
 
 #ifdef GX_INCLUDE_ENCODE
@@ -563,46 +545,46 @@ FORCE_INLINE uint16_t GX_EncodeRGBA8Group(uint32_t inp, uint8_t g, GXEncodeOptio
     }
 }
 
-size_t GX_EncodeI4(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeI4(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts);
 
-size_t GX_EncodeI8(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeI8(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts);
 
-size_t GX_EncodeIA4(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeIA4(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts);
 
-size_t GX_EncodeIA8(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeIA8(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts);
 
-size_t GX_EncodeCI4(uint16_t w, uint16_t h, size_t inIdxSz, uint32_t *inIdx, size_t palSz, size_t outIdxSz,
+GX_EXPORT size_t GX_EncodeCI4(uint16_t w, uint16_t h, size_t inIdxSz, uint32_t *inIdx, size_t palSz, size_t outIdxSz,
 uint8_t *outIdx, GXEncodeOptions_t *opts);
 
-size_t GX_EncodeCI8(uint16_t w, uint16_t h, size_t inIdxSz, uint32_t *inIdx, size_t palSz, size_t outIdxSz,
+GX_EXPORT size_t GX_EncodeCI8(uint16_t w, uint16_t h, size_t inIdxSz, uint32_t *inIdx, size_t palSz, size_t outIdxSz,
 uint8_t *outIdx, GXEncodeOptions_t *opts);
 
-size_t GX_EncodeCI14X2(uint16_t w, uint16_t h, size_t inIdxSz, uint32_t *inIdx, size_t palSz, size_t outIdxSz,
+GX_EXPORT size_t GX_EncodeCI14X2(uint16_t w, uint16_t h, size_t inIdxSz, uint32_t *inIdx, size_t palSz, size_t outIdxSz,
 uint8_t *outIdx, GXEncodeOptions_t *opts);
 
-size_t GX_EncodeR5G6B5(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeR5G6B5(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts);
 
-size_t GX_EncodeRGB5A3(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeRGB5A3(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts);
 
-size_t GX_EncodeRGBA8(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeRGBA8(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts);
 
-size_t GX_EncodeCMP(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
+GX_EXPORT size_t GX_EncodeCMP(uint16_t w, uint16_t h, size_t inSz, uint32_t* in, size_t outSz, uint8_t *out,
 GXEncodeOptions_t *opts);
 
-bool GX_EncodePaletteIA8(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEncodeOptions_t *opts);
+GX_EXPORT bool GX_EncodePaletteIA8(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEncodeOptions_t *opts);
 
-bool GX_EncodePaletteR5G6B5(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEncodeOptions_t *opts);
+GX_EXPORT bool GX_EncodePaletteR5G6B5(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEncodeOptions_t *opts);
 
-bool GX_EncodePaletteRGB5A3(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEncodeOptions_t *opts);
+GX_EXPORT bool GX_EncodePaletteRGB5A3(size_t palSz, uint32_t *pal, uint16_t *palOut, GXEncodeOptions_t *opts);
 
-bool GX_BuildPalette(uint16_t w, uint16_t h, size_t inSz, uint32_t *in, size_t palSz, uint32_t *pal, size_t outIdxSz,
+GX_EXPORT bool GX_BuildPalette(uint16_t w, uint16_t h, size_t inSz, uint32_t *in, size_t palSz, uint32_t *pal, size_t outIdxSz,
 uint32_t *outIdx, size_t *outPalSz, GXEncodeOptions_t *opts);
 #endif
 #endif
