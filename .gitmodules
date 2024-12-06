@@ -1,0 +1,15 @@
+[submodule "extern/stdext"]
+	path = extern/stdext
+	url = https://github.com/xchellx/stdext.git
+[submodule "extern/stb_helpers"]
+	path = extern/stb_helpers
+	url = https://github.com/xchellx/stb_helpers.git
+[submodule "extern/stb"]
+	path = extern/stb
+	url = https://github.com/nothings/stb.git
+[submodule "extern/libsquish"]
+	path = extern/libsquish
+	url = https://github.com/xchellx/libsquish.git
+[submodule "extern/cmake-modules"]
+	path = extern/cmake-modules
+	url = https://github.com/rpavlik/cmake-modules.git
