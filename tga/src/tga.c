@@ -28,7 +28,7 @@
 #include <stdext/catexit.h>
 #include <stdext/cmath.h>
 
-GX_EXPORT void TGA_free(TGA_t *tga) {
+TGA_EXPORT void TGA_free(TGA_t *tga) {
     free(tga->id);
     tga->id = NULL;
     free(tga->data);
