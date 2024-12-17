@@ -232,7 +232,7 @@ FORCE_INLINE uint32_t GX_DecodeRGB5A3Pixel(uint16_t inp, GXDecodeOptions_t *opts
     
     uint32_t p = inp;
     if ((p >> 15) & 0x1) {
-        /* R5G5B5 */
+        /* RGB5 */
         uint32_t b = Dat_Convert5To8((p >> 0 ));
         uint32_t g = Dat_Convert5To8((p >> 5 ));
         uint32_t r = Dat_Convert5To8((p >> 10));
@@ -244,7 +244,7 @@ FORCE_INLINE uint32_t GX_DecodeRGB5A3Pixel(uint16_t inp, GXDecodeOptions_t *opts
             | (a << GX_COMP_SH_A) /* A */
         );
     } else {
-        /* R4G4B4A3 */
+        /* RGB4A3 */
         uint32_t b = Dat_Convert4To8((p >> 0 ));
         uint32_t g = Dat_Convert4To8((p >> 4 ));
         uint32_t r = Dat_Convert4To8((p >> 8 ));
@@ -492,8 +492,8 @@ FORCE_INLINE uint16_t GX_EncodeRGB5A3Pixel(uint32_t inp, GXEncodeOptions_t *opts
     FAKEREF(opts);
     
     // Everything >= 7 alpha will decode as 255
-    uint32_t m = (inp >> GX_COMP_SH_A) & 0xFF;
-    if (m >= 7) {
+    uint16_t a = Dat_Convert8To3((inp >> GX_COMP_SH_A) & 0xFF);
+    if (a >= 7) {
         // RGB5
         uint16_t r = Dat_Convert8To5((inp >> GX_COMP_SH_R) & 0xFF);
         uint16_t g = Dat_Convert8To5((inp >> GX_COMP_SH_G) & 0xFF);
@@ -506,7 +506,6 @@ FORCE_INLINE uint16_t GX_EncodeRGB5A3Pixel(uint32_t inp, GXEncodeOptions_t *opts
         ); 
     } else {
         // RGB4A3
-        uint16_t a = Dat_Convert8To3((inp >> GX_COMP_SH_A) & 0xFF);
         uint16_t r = Dat_Convert8To4((inp >> GX_COMP_SH_R) & 0xFF);
         uint16_t g = Dat_Convert8To4((inp >> GX_COMP_SH_G) & 0xFF);
         uint16_t b = Dat_Convert8To4((inp >> GX_COMP_SH_B) & 0xFF);
