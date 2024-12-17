@@ -108,7 +108,7 @@ typedef uint8_t TGAImageDescriptor_t;
 // - Using GNU compound statements is not portable and has its own scope (making it unusable inline).
 // - Using bitfields in a struct is not portable, see: https://lwn.net/Articles/478657/
 // - Seperate _set and _get functions is ugly and error prone.
-// FIXME: Figure out a workaround for the `gnu-zero-variadic-macro-arguments` and `Wc23-extensions` error for these
+// FIXME: Figure out a workaround for the `gnu-zero-variadic-macro-arguments` and `c23-extensions` error for these
 //        bitfields
 
 // Alpha Bits Per Pixel - Field 5.6 (bits 0 to 3)
@@ -118,7 +118,7 @@ typedef uint8_t TGAImageDescriptor_t;
 #define TGAImageDescriptor_alphaBitLength(...) \
     _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wgnu-zero-variadic-macro-arguments\"") \
-    _Pragma("GCC diagnostic ignored \"-WWc23-extensions\"") \
+    _Pragma("GCC diagnostic ignored \"-Wc23-extensions\"") \
     _TGAImageDescriptor_alphaBitLength(__VA_ARGS__) \
     _Pragma("GCC diagnostic pop")
 
@@ -129,7 +129,7 @@ typedef uint8_t TGAImageDescriptor_t;
 #define TGAImageDescriptor_flipXOrigin(...) \
     _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wgnu-zero-variadic-macro-arguments\"") \
-    _Pragma("GCC diagnostic ignored \"-WWc23-extensions\"") \
+    _Pragma("GCC diagnostic ignored \"-Wc23-extensions\"") \
     _TGAImageDescriptor_flipXOrigin(__VA_ARGS__) \
     _Pragma("GCC diagnostic pop")
 
@@ -140,7 +140,7 @@ typedef uint8_t TGAImageDescriptor_t;
 #define TGAImageDescriptor_flipYOrigin(...) \
     _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wgnu-zero-variadic-macro-arguments\"") \
-    _Pragma("GCC diagnostic ignored \"-WWc23-extensions\"") \
+    _Pragma("GCC diagnostic ignored \"-Wc23-extensions\"") \
     _TGAImageDescriptor_flipYOrigin(__VA_ARGS__) \
     _Pragma("GCC diagnostic pop")
 
@@ -152,7 +152,7 @@ typedef uint8_t TGAImageDescriptor_t;
 #define TGAImageDescriptor_reserved(...) \
     _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wgnu-zero-variadic-macro-arguments\"") \
-    _Pragma("GCC diagnostic ignored \"-WWc23-extensions\"") \
+    _Pragma("GCC diagnostic ignored \"-Wc23-extensions\"") \
     _TGAImageDescriptor_reserved(__VA_ARGS__) \
     _Pragma("GCC diagnostic pop")
 
